@@ -40,7 +40,7 @@ class ThreadConcurrence(ConcurrenceBase):
     def __init__(self, **kwargs):
         super(ThreadConcurrence, self).__init__(**kwargs)
 
-    def thread_resolve(self, domains):
+    def thread_resolve(self, domains, **query_args):
         chunks = self.chunk_domains(domains)
         threads = []
         for i in xrange_compat(self.threads):
@@ -48,7 +48,7 @@ class ThreadConcurrence(ConcurrenceBase):
                 chunk = next(chunks)
             except StopIteration:
                 break
-            t = Thread(target=self.__thread, args=(chunk,))
+            t = Thread(target=self.__thread, args=(chunk, query_args))
             t.start()
             threads.append(t)
         [t.join() for t in threads]
@@ -60,9 +60,9 @@ class ThreadConcurrence(ConcurrenceBase):
                 break
         return result
 
-    def __thread(self, domains):
+    def __thread(self, domains, query_args):
         for d in domains:
-            self.queue.put(self.query(d))
+            self.queue.put(self.query(d, **query_args))
 
-    def query(self, domain):
+    def query(self, domain, **query_args):
         return NotImplementedError('Function for query one domain, implement it.')

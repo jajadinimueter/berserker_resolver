@@ -30,14 +30,14 @@ class WwwMixin(object):
         resolved = ((r.match(x).group(1), y) for x, y in resolved)
         return fold(resolved)
 
-    def resolve(self, domains):
+    def resolve(self, domains, **query_args):
         resolved = None
         resolve_orig = super(WwwMixin, self).resolve
         if self.www_resolve:
             domains = self.www_add(domains)
-            resolved = resolve_orig(domains)
+            resolved = resolve_orig(domains, **query_args)
             if self.www_resolve_combine:
                 resolved = self.www_combine(resolved)
         else:
-            resolved = resolve_orig(domains)
+            resolved = resolve_orig(domains, **query_args)
         return resolved
